@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CapStack — stack the capital, close the gap</title>
+<meta name="description" content="CapStack models real-estate capital stacks: senior debt, LIHTC & historic tax credits, grants, soft loans, deferred developer fee, and equity — see your financing gap, blended cost, stacking conflicts, and the order to secure each source.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d1117'/%3E%3Crect x='7' y='19' width='18' height='5' rx='1.5' fill='%2338bdf8'/%3E%3Crect x='9' y='13' width='14' height='5' rx='1.5' fill='%23eab308'/%3E%3Crect x='11' y='7' width='10' height='5' rx='1.5' fill='%2334d399'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0d1117">
+<link rel="manifest" href='data:application/manifest+json,{"name":"CapStack","short_name":"CapStack","start_url":".","display":"standalone","background_color":"%230d1117","theme_color":"%230d1117","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27%3E%3Crect width=%27512%27 height=%27512%27 rx=%27110%27 fill=%27%230d1117%27/%3E%3Crect x=%27110%27 y=%27300%27 width=%27292%27 height=%2778%27 rx=%2722%27 fill=%27%2338bdf8%27/%3E%3Crect x=%27140%27 y=%27206%27 width=%27232%27 height=%2778%27 rx=%2722%27 fill=%27%23eab308%27/%3E%3Crect x=%27172%27 y=%27112%27 width=%27168%27 height=%2778%27 rx=%2722%27 fill=%27%2334d399%27/%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CapStack">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+const GA_ID="";
+if(GA_ID){const s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+GA_ID;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',GA_ID);}
+</script>
+<style>
+:root{--bg:#0d1117;--panel:#11161d;--card:#161d26;--line:#232f3d;--ink:#e9eef4;--dim:#96a6b6;--faint:#5e7080;
+--gold:#eab308;--sky:#38bdf8;--green:#34d399;--bad:#f87171;--purp:#a78bfa;--rose:#fb7185;--orange:#fb923c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.55}
+h1,h2,h3,h4{margin:0}
+button,input,select{font-family:inherit}
+a{color:var(--sky)}
+header{position:sticky;top:0;z-index:40;height:58px;display:flex;align-items:center;gap:12px;padding:0 16px;background:linear-gradient(180deg,#121924,#0d1117);border-bottom:1px solid var(--line)}
+header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(234,179,8,.5),rgba(56,189,248,.5),transparent)}
+#logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.02em}
+#logo b{color:var(--gold)}
+.hsp{flex:1}
+.pill{font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:6px 13px;color:var(--dim);background:var(--card);cursor:pointer}
+.pill.pro{background:linear-gradient(90deg,#eab308,#f59e0b);color:#221a03;border:none;font-weight:700}
+.pill.prodone{background:rgba(52,211,153,.15);color:var(--green);border-color:rgba(52,211,153,.4)}
+.tagline{background:linear-gradient(120deg,rgba(234,179,8,.09),rgba(56,189,248,.06));border-bottom:1px solid var(--line);padding:18px 16px;text-align:center}
+.tagline h1{font-family:Fraunces,serif;font-size:clamp(20px,3.4vw,28px)}
+.tagline h1 em{font-style:italic;color:var(--gold)}
+.tagline p{color:var(--dim);font-size:13.5px;margin:6px auto 0;max-width:76ch}
+#app{display:grid;grid-template-columns:400px 1fr;max-width:1280px;margin:0 auto;align-items:start}
+#inputs{padding:20px 18px 40px;border-right:1px solid var(--line);position:sticky;top:58px;max-height:calc(100dvh - 58px);overflow-y:auto;scrollbar-width:thin}
+#out{padding:20px 22px 90px;min-width:0}
+@media(max-width:900px){#app{grid-template-columns:1fr}#inputs{position:static;max-height:none;border-right:none;border-bottom:1px solid var(--line)}}
+.lbl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 7px}
+.tin{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ink);padding:12px 13px;font-size:14.5px;outline:none}
+.tin:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(234,179,8,.12)}
+.segrow{display:flex;gap:8px;flex-wrap:wrap}
+.seg{flex:1;min-width:86px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--dim);font-size:12.5px;font-weight:600;padding:10px 6px;cursor:pointer;text-align:center}
+.seg.on{background:linear-gradient(92deg,var(--gold),#f59e0b);border-color:transparent;color:#221a03}
+.src{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:9px;cursor:pointer;transition:.15s}
+.src.on{border-color:var(--sc,#38bdf8)}
+.src .top{display:flex;align-items:center;gap:10px}
+.src .se{font-size:19px}
+.src .st{font-weight:600;font-size:13.5px;flex:1}
+.src .tick{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px;color:transparent;flex:none}
+.src.on .tick{background:var(--sc,#38bdf8);border-color:var(--sc,#38bdf8);color:#08131c}
+.src .amt{display:none;margin-top:10px;gap:8px;align-items:center}
+.src.on .amt{display:flex}
+.src .amt .auto{font-size:12.5px;color:var(--dim);flex:1}
+.src .amt input{width:130px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:8px 10px;font-size:13px;outline:none}
+.src .why{font-size:11px;color:var(--faint);margin-top:7px;display:none}
+.src.on .why{display:block}
+details.asm{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+details.asm summary{cursor:pointer;font-size:12.5px;font-weight:700;padding:10px 0;color:var(--dim)}
+.asmrow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);padding:6px 0}
+.asmrow input{margin-left:auto;width:82px;background:var(--panel);border:1px solid var(--line);border-radius:9px;color:var(--ink);padding:7px 9px;font-size:12.5px;outline:none}
+#runBtn{width:100%;border:none;border-radius:13px;padding:14px;font-size:16px;font-weight:700;color:#221a03;background:linear-gradient(92deg,var(--gold),#f59e0b);cursor:pointer;margin-top:18px;box-shadow:0 6px 18px -6px rgba(234,179,8,.4)}
+.mini{font-size:11.5px;color:var(--faint);margin-top:10px;line-height:1.5}
+.bigcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+.secl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.secl:after{content:"";flex:1;height:1px;background:var(--line)}
+.secl .lock{color:var(--gold)}
+.gapbig{font-family:Fraunces,serif;font-size:clamp(30px,4.6vw,44px);font-weight:700;line-height:1}
+.gapsub{color:var(--dim);font-size:13px;margin-top:5px}
+.stackbar{display:flex;height:46px;border-radius:12px;overflow:hidden;margin:16px 0 10px;border:1px solid var(--line)}
+.stackbar .segm{min-width:2px;position:relative}
+.stackbar .segm.gap{background:repeating-linear-gradient(135deg,rgba(248,113,113,.5) 0 7px,rgba(248,113,113,.2) 7px 14px)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;color:var(--dim)}
+.legend .li{display:flex;gap:7px;align-items:center}
+.legend .sw{width:11px;height:11px;border-radius:3px}
+.sut{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.sut td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.05)}
+.sut td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.flag{display:flex;gap:10px;font-size:13px;padding:10px 12px;border-radius:12px;margin-bottom:8px;line-height:1.5}
+.f-ok{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3)}
+.f-warn{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.35)}
+.f-bad{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4)}
+.play{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;background:rgba(255,255,255,.02)}
+.play h4{font-size:14px;display:flex;gap:9px;align-items:center}
+.play ul{margin:10px 0 0;padding-left:20px;color:var(--dim);font-size:13px}
+.play li{margin-bottom:6px}
+.play .lockli{list-style:none;margin-left:-20px;color:var(--gold);font-size:12.5px;font-weight:600;cursor:pointer}
+.seq{position:relative;padding-left:20px}
+.seq:before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--gold),var(--sky))}
+.step{position:relative;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:9px;font-size:13.5px}
+.step:before{content:"";position:absolute;left:-18px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.step b{display:block}
+.step small{color:var(--faint)}
+.locknote{background:linear-gradient(120deg,rgba(234,179,8,.1),rgba(245,158,11,.06));border:1px solid rgba(234,179,8,.35);border-radius:14px;padding:16px;font-size:13.5px;color:#f3dfa2}
+.locknote b{color:var(--gold)}
+.lockbtn{display:inline-block;margin-top:10px;background:linear-gradient(90deg,#eab308,#f59e0b);color:#221a03;font-weight:700;font-size:13px;border:none;border-radius:999px;padding:9px 16px;cursor:pointer;text-decoration:none}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.smallbtn{background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ink);font-weight:600;font-size:13px;padding:10px 16px;cursor:pointer}
+.disc{font-size:11.5px;color:var(--faint);line-height:1.6;margin-top:20px;border-top:1px solid var(--line);padding-top:14px}
+#modal{position:fixed;inset:0;z-index:80;display:none;place-items:center;background:rgba(3,7,12,.72)}
+#modal.on{display:grid}
+#mcard{width:min(94vw,460px);max-height:86vh;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px}
+#mcard h2{font-family:Fraunces,serif;font-size:21px;margin-bottom:8px}
+#mcard p{font-size:13.5px;color:var(--dim)}
+.closex{float:right;background:none;border:none;color:var(--faint);font-size:22px;cursor:pointer}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(90px);background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;z-index:90;transition:transform .25s}
+#toast.on{transform:translateX(-50%) translateY(0)}
+footer{max-width:1280px;margin:0 auto;padding:0 22px 40px;color:var(--faint);font-size:12px}
+@media print{header,.tagline,#inputs,.rowbtns,.locknote,footer .np{display:none!important}
+body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;background:#fff;color:#000}
+.gapbig{color:#000}#app{display:block}}
+</style>
+</head>
+<body>
+<header>
+  <div id="logo"><svg width="26" height="26" viewBox="0 0 32 32"><rect x="7" y="21" width="18" height="5" rx="2" fill="#38bdf8"/><rect x="9" y="14" width="14" height="5" rx="2" fill="#eab308"/><rect x="11" y="7" width="10" height="5" rx="2" fill="#34d399"/></svg> Cap<b>Stack</b></div>
+  <div class="hsp"></div>
+  <button class="pill pro" id="proBtn">Go Pro</button>
+</header>
+
+<div class="tagline">
+  <h1>Stack the capital. <em>Close the gap.</em></h1>
+  <p>Layer senior debt, tax-credit equity, grants, soft loans, deferred fee, and sponsor equity against your total development cost — see the financing gap, the blended cost of capital, the stacking conflicts, and the order to chase each source.</p>
+</div>
+
+<div id="app">
+  <div id="inputs">
+    <label class="lbl">Total development cost (TDC, $)</label>
+    <input class="tin" id="tdcIn" type="number" value="12000000" step="100000" min="0">
+    <label class="lbl">Stabilized NOI (optional — sizes the senior loan, $/yr)</label>
+    <input class="tin" id="noiIn" type="number" value="780000" step="10000" min="0">
+
+    <label class="lbl">Deal profile</label>
+    <div class="segrow" id="profRow"></div>
+    <div class="mini" id="profNote"></div>
+
+    <label class="lbl">Capital sources (tap to layer in · override any amount)</label>
+    <div id="srcList"></div>
+
+    <details class="asm"><summary>⚙ Assumptions (editable)</summary><div id="asmBox"></div></details>
+
+    <button id="runBtn">Stack it →</button>
+    <p class="mini">Planning math with editable assumptions — not underwriting, and never tax, legal, or investment advice. Credit pricing and program rules vary by market and year.</p>
+  </div>
+
+  <div id="out"><div id="scenRow"></div><div id="results"></div></div>
+</div>
+
+<footer><span class="np">CapStack · a <a href="https://nesoai.github.io/mallory/" target="_blank" rel="noopener">Boundless</a> tool · v1.0 · </span>Educational planning estimates only. Confirm every source with your lender, syndicator, CPA, and counsel.</footer>
+<div id="modal"><div id="mcard"><button class="closex" id="mClose">×</button><h2 id="mTitle"></h2><div id="mBody"></div></div></div>
+<div id="toast"></div>
+
+<script>
+/* ============ CAPSTACK v1.0 — config ============ */
+const BUY_URL="#";            // ← Gumroad / Stripe payment link for Pro
+const PRICE_TXT="$39 one-time";
+const SERVICE_FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSeQeG0kgYk2LuVWYUHswlcy9TbZS5KeQg_bNDTB7HUkELecww/viewform";
+const SERVICE_EMAIL="boundless.mbf@gmail.com";
+
+/* ============ DATA ============ */
+const PROFILES=[
+ ['l9','🏘 LIHTC 9%',['senior','lihtc','deffee','soft','grant'],'Competitive 9% credits: deepest subsidy, hardest award. Credit rate ≈ 9%.',9],
+ ['l4','🏗 LIHTC 4% + bonds',['senior','lihtc','deffee','soft','gap'],'As-of-right 4% credits with tax-exempt bonds. Watch the 50% test. Credit rate ≈ 4%.',4],
+ ['mkt','🏙 Market-rate MF',['senior','equity','mezz'],'Conventional stack: senior + equity, mezz if needed.',0],
+ ['hist','🏛 Historic rehab',['senior','htc','equity','grant'],'20% federal HTC on qualified rehab expenditures; many states add more.',0],
+ ['mix','🌆 Commercial / mixed',['senior','equity','grant','gap'],'Flexible stack; public gap tools where the deal earns them.',0]
+];
+const SRC={
+ senior:{e:'🏦',n:'Senior debt',c:'#38bdf8',cost:a=>A.rate/100,
+  why:'Sized by the lesser of the LTC cap and what NOI can carry at the DSCR.',
+  play:['Get term sheets from 3 lender types — bank, agency, debt fund — the spread between them is real money.','Size to the DSCR at a stressed rate (+50 bps), not today\u2019s quote, so a rate move doesn\u2019t reopen the stack.','Negotiate an earn-out or resize at stabilization instead of borrowing less on day one.']},
+ lihtc:{e:'🧩',n:'LIHTC equity',c:'#34d399',cost:a=>0,
+  why:'Eligible basis × credit rate × 10 years × investor price per credit.',
+  play:['Talk to two syndicators AND one direct investor — pricing spreads of 3–6¢ per credit are common.','Confirm your basis boost eligibility (QCT/DDA or state discretion) before you model — it\u2019s a 30% swing.','Lock the adjusters: who eats it if credits deliver late or basis comes in low?']},
+ htc:{e:'🏛',n:'Historic tax credit equity',c:'#a78bfa',cost:a=>0,
+  why:'20% of qualified rehabilitation expenditures × investor price.',
+  play:['Get Part 1/Part 2 approvals moving before closing — SHPO comments can redesign your scope.','If pairing with LIHTC, model the basis reduction from the HTC — they interact.','State HTCs stack on federal in 35+ states; check yours before writing the pro forma.']},
+ grant:{e:'🎁',n:'Grants',c:'#eab308',cost:a=>0,
+  why:'Public or philanthropic funds — enter your target amount.',
+  play:['Match grant purposes to line items now; commingled uses cause clawback headaches later.','Letters of intent from grantors count as commitments for other funders — collect them early.','Budget the compliance/reporting labor; a grant with heavy reporting is not free money.']},
+ soft:{e:'🤝',n:'Soft loan (HOME/CDBG-type)',c:'#fb923c',cost:a=>0.01,
+  why:'Subordinate public loans, often 0–2%, cash-flow contingent.',
+  play:['Ask for cash-flow-contingent payments and a long maturity — soft should mean soft.','Layering rules: HOME + LIHTC have per-unit subsidy limits; check them before sizing.','Get the subordination and standstill terms agreed early — your senior lender will insist.']},
+ deffee:{e:'⏳',n:'Deferred developer fee',c:'#f472b6',cost:a=>0,
+  why:'Part of your own fee left in the deal — cheapest gap filler you have.',
+  play:['LIHTC deals must reasonably project repayment within 15 years — model it or lose basis.','Defer against cash flow AFTER debt service and reserves, not before.','Your fee is collateral of last resort — don\u2019t promise the same dollars to two gaps.']},
+ equity:{e:'💼',n:'Sponsor / LP equity',c:'#e879f9',cost:a=>0.18,
+  why:'The most expensive dollars in the stack — minimize last.',
+  play:['Every other source you add is equity you don\u2019t have to raise — order matters.','Preferred return + promote structure beats straight splits for aligning a small LP base.','Show LPs the whole stack; sophisticated money prices the gap you HAVEN\u2019T closed.']},
+ mezz:{e:'🪜',n:'Mezzanine / gap loan',c:'#fb7185',cost:a=>0.12,
+  why:'Expensive bridge between senior and equity — use sparingly.',
+  play:['Get the intercreditor agreement negotiated early; senior lenders veto late mezz.','Compare mezz vs. pref equity — similar cost, very different control rights.','Size it to what stabilization can retire, not what closing needs.']},
+ gap:{e:'🧱',n:'Public gap financing',c:'#22d3ee',cost:a=>0.005,
+  why:'TIF, housing trust funds, land write-downs, fee waivers — enter your target.',
+  play:['Ask the city what THEY want scored — gap awards follow local priorities, not need.','Land write-downs and fee waivers are gap money that never shows in a check — count them.','One public commitment unlocks others; sequence the easiest yes first.']}
+};
+/* ============ STATE ============ */
+const $=id=>document.getElementById(id);
+const KEY='capstack.v1';
+let S=Object.assign({pro:false,scen:[]},(()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}})());
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function toast(t){const x=$('toast');x.textContent=t;x.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>x.classList.remove('on'),2600)}
+const fm=n=>'$'+Math.round(n).toLocaleString('en-US');
+const pc=n=>(n*100).toFixed(1)+'%';
+
+let sel={prof:'l9',on:new Set(PROFILES[0][2]),ovr:{}};
+const A={rate:6.75,amort:30,dscr:1.20,ltc:65,cprice:0.87,basis:80,hprice:0.90,qre:75,fee:12,defer:60};
+
+/* ============ INPUT UI ============ */
+$('profRow').innerHTML=PROFILES.map(p=>`<button class="seg ${p[0]===sel.prof?'on':''}" data-v="${p[0]}">${p[1]}</button>`).join('');
+$('profRow').querySelectorAll('.seg').forEach(b=>b.onclick=()=>{
+  sel.prof=b.dataset.v;
+  $('profRow').querySelectorAll('.seg').forEach(x=>x.classList.toggle('on',x===b));
+  sel.on=new Set(PROFILES.find(p=>p[0]===sel.prof)[2]); sel.ovr={};
+  profNote(); renderSrc(); run();
+});
+function profNote(){$('profNote').textContent=PROFILES.find(p=>p[0]===sel.prof)[3];}
+function renderSrc(){
+  $('srcList').innerHTML=Object.keys(SRC).map(k=>{const s=SRC[k];const on=sel.on.has(k);
+    return `<div class="src ${on?'on':''}" data-k="${k}" style="--sc:${s.c}">
+      <div class="top"><span class="se">${s.e}</span><span class="st">${s.n}</span><span class="tick">✓</span></div>
+      <div class="amt"><span class="auto" id="auto-${k}"></span><input type="number" placeholder="override $" id="ovr-${k}" value="${sel.ovr[k]??''}"></div>
+      <div class="why">${s.why}</div></div>`;}).join('');
+  $('srcList').querySelectorAll('.src').forEach(el=>{
+    el.querySelector('.top').onclick=()=>{const k=el.dataset.k;
+      sel.on.has(k)?sel.on.delete(k):sel.on.add(k);
+      el.classList.toggle('on'); run();};
+    const inp=el.querySelector('input');
+    inp.onclick=e=>e.stopPropagation();
+    inp.oninput=()=>{const v=parseFloat(inp.value);const k=el.dataset.k;
+      if(isNaN(v))delete sel.ovr[k]; else sel.ovr[k]=v; run();};
+  });
+}
+const ASM=[['rate','Senior rate %'],['amort','Amortization (yrs)'],['dscr','Min DSCR'],['ltc','LTC cap %'],['cprice','LIHTC price $/credit'],['basis','Eligible basis % of TDC'],['hprice','HTC price $/credit'],['qre','QRE % of TDC'],['fee','Developer fee % of TDC'],['defer','Fee deferrable %']];
+$('asmBox').innerHTML=ASM.map(a=>`<div class="asmrow">${a[1]}<input type="number" step="0.05" id="a-${a[0]}" value="${A[a[0]]}"></div>`).join('');
+ASM.forEach(a=>$('a-'+a[0]).oninput=()=>{const v=parseFloat($('a-'+a[0]).value);if(!isNaN(v)){A[a[0]]=v;run();}});
+['tdcIn','noiIn'].forEach(id=>$(id).oninput=()=>run());
+$('runBtn').onclick=()=>{run();const r=$('results');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'start'});};
+
+/* ============ MODEL ============ */
+function mconst(rate,yrs){const r=rate/1200,n=yrs*12;if(r<=0)return 1/n*12;return (r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1))*12;}
+function autoAmt(k,tdc,noi){
+  const credit=PROFILES.find(p=>p[0]===sel.prof)[4];
+  switch(k){
+    case 'senior':{
+      const ltcCap=tdc*A.ltc/100;
+      if(!noi)return ltcCap;
+      const cap=noi/A.dscr/mconst(A.rate,A.amort);
+      return Math.max(0,Math.min(ltcCap,cap));}
+    case 'lihtc':{const cr=credit||4; return tdc*(A.basis/100)*(cr/100)*10*A.cprice;}
+    case 'htc':  return tdc*(A.qre/100)*0.20*A.hprice;
+    case 'deffee':return tdc*(A.fee/100)*(A.defer/100);
+    case 'grant':return tdc*0.05;
+    case 'soft': return tdc*0.08;
+    case 'gap':  return tdc*0.05;
+    case 'mezz': return tdc*0.10;
+    case 'equity':return tdc*0.10;
+  }
+  return 0;
+}
+function compute(){
+  const tdc=+$('tdcIn').value||0, noi=+$('noiIn').value||0;
+  const rows=[...sel.on].map(k=>{
+    const auto=autoAmt(k,tdc,noi);
+    const amt=(sel.ovr[k]!=null&&!isNaN(sel.ovr[k]))?sel.ovr[k]:auto;
+    return {k,auto,amt,src:SRC[k]};
+  });
+  const total=rows.reduce((a,r)=>a+r.amt,0);
+  const gap=tdc-total;
+  const costed=rows.filter(r=>r.amt>0);
+  const wacc=costed.length&&total>0?costed.reduce((a,r)=>a+r.amt*r.src.cost(A),0)/total:0;
+  return {tdc,noi,rows,total,gap,wacc};
+}
+function flags(R){
+  const out=[];
+  const sen=R.rows.find(r=>r.k==='senior');
+  if(sen&&R.noi){
+    const ds=sen.amt*mconst(A.rate,A.amort);
+    const dscr=ds>0?R.noi/ds:99;
+    out.push([dscr>=A.dscr?'ok':'bad',`DSCR at this senior size: <b>${dscr.toFixed(2)}</b> (min ${A.dscr}). ${dscr>=A.dscr?'Debt service covers.':'NOI cannot carry this loan — shrink senior or grow NOI.'}`]);
+    out.push([sen.amt<=R.tdc*A.ltc/100+1?'ok':'warn',`Senior is ${pc(sen.amt/R.tdc)} of TDC (LTC cap ${A.ltc}%).`]);
+  }
+  if(sel.prof==='l4'&&sen)out.push([sen.amt>=R.tdc*0.5?'ok':'warn',`<b>50% test:</b> 4% deals need tax-exempt bonds ≥ 50% of aggregate basis. Your senior/bond layer is ${pc(sen.amt/R.tdc)} of TDC — ${sen.amt>=R.tdc*0.5?'likely clears':'likely fails'}; confirm against actual aggregate basis with bond counsel.`]);
+  const dd=R.rows.find(r=>r.k==='deffee');
+  if(dd&&dd.amt>R.tdc*(A.fee/100))out.push(['bad',`Deferred fee exceeds the whole developer fee (${A.fee}% of TDC) — impossible; lower it.`]);
+  else if(dd&&sel.prof.startsWith('l'))out.push(['warn','Deferred fee on LIHTC deals must reasonably repay from cash flow within 15 years to stay in basis — model the repayment.']);
+  if(R.rows.find(r=>r.k==='lihtc')&&R.rows.find(r=>r.k==='htc'))out.push(['warn','LIHTC + HTC pairing: the federal HTC reduces LIHTC eligible basis — the two equities are not simply additive. Model with your accountant.']);
+  if(R.rows.find(r=>r.k==='lihtc')&&R.rows.find(r=>r.k==='gap')&&sel.prof==='l9')out.push(['warn','Stacking public gap funds with 9% credits can trigger subsidy-layering review — disclose everything to the allocating agency.']);
+  if(R.gap<=0&&R.total>0)out.push(['ok',`Stack is ${R.gap<0?'over-sourced by '+fm(-R.gap)+' — trim the most expensive layer (usually equity or mezz)':'exactly balanced'}.`]);
+  return out;
+}
+const SEQ=[
+ ['Site control + concept budget','Month 0–2','Option or purchase contract; order the market study early — everyone downstream asks for it.'],
+ ['Soft commitments tour','Month 1–4','City, county, trust funds, grantors: collect letters of intent — they score points in every later application.'],
+ ['Credit / bond applications','Month 3–9','9% rounds are annual and competitive; 4%/bond and HTC Part 2 run on your schedule. Applications reference the soft letters.'],
+ ['Senior term sheets','Month 4–8','Lenders commit around the credit award; bring the full stack so they price the real deal.'],
+ ['Award → syndication','Month 8–14','Credit pricing locks with the investor; adjusters negotiated; gap sized for real.'],
+ ['Financial closing','Month 12–18','Everything signs at once — intercreditor, subordination, regulatory agreements. Then you build.']
+];
+
+/* ============ PRO ============ */
+function checkCode(c){c=(c||'').trim().toUpperCase();
+  if(!/^CAP-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(c))return false;
+  const b=c.replace(/[^A-Z0-9]/g,'').slice(3);let t=0;for(const ch of b)t+=ch.charCodeAt(0);
+  return t%31===11;}
+function openModal(t,b){$('mTitle').textContent=t;$('mBody').innerHTML=b;$('modal').classList.add('on');}
+$('mClose').onclick=()=>$('modal').classList.remove('on');
+$('modal').onclick=e=>{if(e.target.id==='modal')$('modal').classList.remove('on');};
+function openPro(msg){
+  openModal('CapStack Pro',`<p>${msg||'One unlock, yours forever on this device:'}</p>
+   <ul style="color:var(--dim);font-size:13.5px;line-height:1.9;padding-left:18px;margin:8px 0 14px">
+     <li>Every playbook tactic for every source</li>
+     <li>Printable lender-ready sources &amp; uses exhibit</li>
+     <li>Unlimited pinned scenarios</li></ul>
+   <a class="lockbtn" href="${BUY_URL}" target="_blank" rel="noopener">Get Pro — ${PRICE_TXT} →</a>
+   <div style="display:flex;gap:8px;align-items:center;margin-top:14px">
+     <input class="tin" id="codeIn" placeholder="CAP-XXXX-XXXX" style="flex:1">
+     <button class="lockbtn" id="applyCode" style="background:var(--green);color:#04211a;margin:0">Apply</button></div>`);
+  $('applyCode').onclick=()=>{
+    if(checkCode($('codeIn').value)){S.pro=true;save();proUI();$('modal').classList.remove('on');toast('🎉 Pro unlocked');run();}
+    else toast('That code doesn\u2019t look right');};
+}
+function proUI(){$('proBtn').textContent=S.pro?'✓ Pro':'Go Pro';$('proBtn').className='pill '+(S.pro?'prodone':'pro');}
+$('proBtn').onclick=()=>S.pro?toast('Pro is active on this device ✓'):openPro();
+
+/* ============ SCENARIOS ============ */
+function renderScens(){
+  $('scenRow').innerHTML=S.scen.map((sc,i)=>`<span class="pill" style="margin:0 8px 8px 0;cursor:pointer" data-i="${i}">📌 ${sc.label}<span style="color:var(--faint)" data-x="${i}"> ✕</span></span>`).join('');
+  $('scenRow').querySelectorAll('.pill').forEach(c=>c.onclick=e=>{
+    if(e.target.dataset.x!==undefined){S.scen.splice(+e.target.dataset.x,1);save();renderScens();return;}
+    const sc=S.scen[+c.dataset.i];
+    sel={prof:sc.prof,on:new Set(sc.on),ovr:sc.ovr||{}};
+    $('tdcIn').value=sc.tdc;$('noiIn').value=sc.noi;
+    $('profRow').querySelectorAll('.seg').forEach(x=>x.classList.toggle('on',x.dataset.v===sc.prof));
+    profNote();renderSrc();run();
+  });
+}
+
+/* ============ RENDER ============ */
+function run(){
+  const R=compute();
+  if(!R.rows.length||!R.tdc){$('results').innerHTML='<div class="bigcard" style="text-align:center;color:var(--dim)">Enter a TDC and tap at least one capital source.</div>';return;}
+  const gapPct=R.tdc?Math.max(0,R.gap)/R.tdc:0;
+  let h=`<div class="bigcard">
+    <div class="gapbig" style="color:${R.gap>1000?'var(--bad)':'var(--green)'}">${R.gap>1000?fm(R.gap)+' gap':'✓ Gap closed'}</div>
+    <div class="gapsub">${fm(R.total)} sourced of ${fm(R.tdc)} TDC · blended cost of capital ≈ <b>${pc(R.wacc)}</b></div>
+    <div class="stackbar">${R.rows.filter(r=>r.amt>0).map(r=>`<div class="segm" style="background:${r.src.c};width:${(r.amt/R.tdc*100)}%" title="${r.src.n} ${fm(r.amt)}"></div>`).join('')}${R.gap>0?`<div class="segm gap" style="width:${gapPct*100}%"></div>`:''}</div>
+    <div class="legend">${R.rows.filter(r=>r.amt>0).map(r=>`<span class="li"><span class="sw" style="background:${r.src.c}"></span>${r.src.n} · ${pc(r.amt/R.tdc)}</span>`).join('')}${R.gap>1000?`<span class="li"><span class="sw" style="background:var(--bad)"></span>GAP · ${pc(gapPct)}</span>`:''}</div>
+  </div>`;
+
+  h+=`<div class="bigcard"><div class="secl">Sources &amp; uses</div><table class="sut">
+    ${R.rows.map(r=>`<tr><td>${r.src.e} ${r.src.n}${sel.ovr[r.k]!=null?' <span style="color:var(--gold);font-size:10px">MANUAL</span>':''}</td><td>${fm(r.amt)}</td></tr>`).join('')}
+    <tr><td><b>Total sources</b></td><td><b>${fm(R.total)}</b></td></tr>
+    <tr><td><b>Total development cost</b></td><td><b>${fm(R.tdc)}</b></td></tr>
+    <tr><td style="color:${R.gap>1000?'var(--bad)':'var(--green)'}"><b>${R.gap>=0?'Remaining gap':'Over-sourced'}</b></td><td style="color:${R.gap>1000?'var(--bad)':'var(--green)'}"><b>${fm(Math.abs(R.gap))}</b></td></tr></table></div>`;
+
+  const F=flags(R);
+  if(F.length)h+=`<div class="bigcard"><div class="secl">Stack checks</div>${F.map(f=>`<div class="flag f-${f[0]}"><span>${f[0]==='ok'?'✅':f[0]==='warn'?'⚠️':'⛔'}</span><span>${f[1]}</span></div>`).join('')}</div>`;
+
+  h+=`<div class="bigcard"><div class="secl">Order of operations — securing the stack</div><div class="seq">
+    ${SEQ.map(s=>`<div class="step"><b>${s[0]}</b><small>${s[1]}</small><div style="color:var(--dim);font-size:12.5px;margin-top:4px">${s[2]}</div></div>`).join('')}</div></div>`;
+
+  h+=`<div class="bigcard"><div class="secl">Source playbooks ${S.pro?'':'<span class="lock">· Pro shows every tactic</span>'}</div>`;
+  R.rows.forEach(r=>{
+    const tips=r.src.play, show=S.pro?tips:tips.slice(0,1);
+    h+=`<div class="play"><h4>${r.src.e} ${r.src.n}</h4><ul>${show.map(t=>'<li>'+t+'</li>').join('')}
+      ${S.pro?'':'<li class="lockli" onclick="openPro()">🔒 +'+(tips.length-1)+' more — unlock Pro</li>'}</ul></div>`;});
+  h+=`</div>`;
+
+  if(!S.pro)h+=`<div class="locknote"><b>Close gaps faster.</b> Pro unlocks every playbook tactic, unlimited pinned scenarios, and a printable lender-ready sources &amp; uses exhibit — one small unlock, yours forever.<br>
+    <a class="lockbtn" href="${BUY_URL}" target="_blank" rel="noopener">Get Pro — ${PRICE_TXT} →</a>
+    <button class="lockbtn" style="background:var(--card);color:var(--dim);border:1px solid var(--line)" onclick="openPro()">I have a code</button></div>`;
+
+  const scenTxt='TDC '+fm(R.tdc)+' · '+PROFILES.find(p=>p[0]===sel.prof)[1].slice(2)+' · sources: '+R.rows.map(r=>r.src.n+' '+fm(r.amt)).join(', ')+' · gap '+fm(Math.max(0,R.gap));
+  const mail='mailto:'+SERVICE_EMAIL+'?subject='+encodeURIComponent('CapStack — model my full capital stack')+'&body='+encodeURIComponent('Hi Boundless,\n\nPlease quote a full financial model / capital-stack package.\n\nScenario: '+scenTxt+'\n\nProject details:\nTiming:\n');
+  h+=`<div class="bigcard"><div class="secl">Done for you — by the Boundless team</div>
+    <p style="font-size:13.5px;color:var(--dim);margin:0 0 12px">Lender- and investor-ready financial models, full sources &amp; uses, and application-grade narratives — built on an MBA + civil-engineering foundation. Typical engagements $500–$4,000.</p>
+    <div class="rowbtns" style="margin:0">
+      <a class="lockbtn" style="background:linear-gradient(90deg,var(--green),#22d3ee);color:#04211a;text-decoration:none;margin:0" href="${SERVICE_FORM_URL}" target="_blank" rel="noopener">Start intake →</a>
+      <a class="smallbtn" style="text-decoration:none" href="${mail}">📧 Email this scenario</a></div></div>`;
+
+  h+=`<div class="rowbtns">
+    <button class="smallbtn" id="pinBtn">📌 Pin scenario</button>
+    <button class="smallbtn" id="shareBtn">🔗 Share</button>
+    <button class="smallbtn" id="printBtn">🖨 Lender exhibit ${S.pro?'':'🔒'}</button></div>
+  <p class="disc"><b>Read this:</b> CapStack is an educational planning tool. Credit pricing, program rules, basis math, and layering limits vary by state, year, and deal — every number here is a starting point for conversations with your lender, syndicator, CPA, bond counsel, and attorney, not a substitute for them.</p>`;
+
+  $('results').innerHTML=h;
+  $('pinBtn').onclick=()=>{
+    if(!S.pro&&S.scen.length>=1)return openPro('Free pins one scenario — Pro pins unlimited.');
+    S.scen.push({label:PROFILES.find(p=>p[0]===sel.prof)[1].slice(2)+' · '+fm(R.tdc)+' · gap '+fm(Math.max(0,R.gap)),prof:sel.prof,on:[...sel.on],ovr:sel.ovr,tdc:R.tdc,noi:R.noi});
+    save();renderScens();toast('📌 Pinned');};
+  $('shareBtn').onclick=async()=>{
+    const p={t:R.tdc,n:R.noi,p:sel.prof,o:[...sel.on],v:sel.ovr,a:A};
+    const url=location.origin+location.pathname+'#s='+btoa(JSON.stringify(p)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    try{if(navigator.share)await navigator.share({title:'CapStack scenario',url});else{await navigator.clipboard.writeText(url);toast('🔗 Link copied');}}catch(e){try{await navigator.clipboard.writeText(url);toast('🔗 Link copied');}catch(_){}}};
+  $('printBtn').onclick=()=>{if(!S.pro)return openPro('The lender exhibit is a Pro feature.');window.print();};
+}
+
+/* shared links */
+(function(){
+  if(!location.hash.startsWith('#s='))return;
+  try{let b=location.hash.slice(3).replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';
+    const p=JSON.parse(atob(b));
+    $('tdcIn').value=p.t;$('noiIn').value=p.n;
+    sel={prof:p.p,on:new Set(p.o),ovr:p.v||{}};
+    if(p.a)Object.assign(A,p.a);
+    $('profRow').querySelectorAll('.seg').forEach(x=>x.classList.toggle('on',x.dataset.v===p.p));
+    ASM.forEach(a=>$('a-'+a[0]).value=A[a[0]]);
+    toast('Loaded a shared stack');
+  }catch(e){}
+})();
+
+profNote();renderSrc();proUI();renderScens();run();
+</script>
+</body>
+</html>
