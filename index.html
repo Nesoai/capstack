@@ -112,6 +112,19 @@ footer{max-width:1280px;margin:0 auto;padding:0 22px 40px;color:var(--faint);fon
 @media print{header,.tagline,#inputs,.rowbtns,.locknote,footer .np{display:none!important}
 body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;background:#fff;color:#000}
 .gapbig{color:#000}#app{display:block}}
+
+.tip{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--line);color:var(--dim);font-size:10px;font-weight:700;cursor:help;position:relative;vertical-align:middle;margin-left:4px}
+.tip:hover,.tip:focus{background:var(--green);color:#04211a;outline:none}
+.tipbox{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:220px;background:#0a0f14;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:11.5px;line-height:1.5;color:var(--ink);font-weight:400;text-transform:none;letter-spacing:0;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.15s;z-index:60}
+.tip:hover .tipbox,.tip:focus .tipbox{opacity:1}
+@media(max-width:640px){.tipbox{left:auto;right:-6px;transform:none;width:190px}}
+.scorecard{background:linear-gradient(120deg,rgba(52,211,153,.12),rgba(56,189,248,.07));border-color:rgba(52,211,153,.4)}
+.score-hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.score-big{font-family:Fraunces,serif;font-size:clamp(34px,6vw,54px);font-weight:700;line-height:1;white-space:nowrap}
+.score-note{font-size:14px;color:var(--dim);flex:1;min-width:220px;line-height:1.55}
+.score-note b{color:var(--ink)}
+.score-good{color:var(--green)!important}
+.score-bad{color:var(--bad)!important}
 </style>
 </head>
 <body>
@@ -128,9 +141,9 @@ body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;backgroun
 
 <div id="app">
   <div id="inputs">
-    <label class="lbl">Total development cost (TDC, $)</label>
+    <label class="lbl">Total development cost (TDC, $) <span class="tip" tabindex="0">?<span class="tipbox">Every dollar it takes to build the deal — land, hard costs, soft costs, and reserves. This is the height your stack has to reach.</span></span></label>
     <input class="tin" id="tdcIn" type="number" value="12000000" step="100000" min="0">
-    <label class="lbl">Stabilized NOI (optional — sizes the senior loan, $/yr)</label>
+    <label class="lbl">Stabilized NOI (optional — sizes the senior loan, $/yr) <span class="tip" tabindex="0">?<span class="tipbox">Net operating income: annual rent minus operating expenses. It sets how much senior debt the deal can safely carry.</span></span></label>
     <input class="tin" id="noiIn" type="number" value="780000" step="10000" min="0">
 
     <label class="lbl">Deal profile</label>
@@ -149,7 +162,7 @@ body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;backgroun
   <div id="out"><div id="scenRow"></div><div id="results"></div></div>
 </div>
 
-<footer><span class="np">CapStack · a <a href="https://nesoai.github.io/mallory/" target="_blank" rel="noopener">Boundless</a> tool · v1.3 · © 2026 Boundless / Mallory Bailey-Finkley — all rights reserved · </span>Educational planning estimates only. Confirm every source with your lender, syndicator, CPA, and counsel.</footer>
+<footer><span class="np">CapStack · a <a href="https://nesoai.github.io/mallory/" target="_blank" rel="noopener">Boundless</a> tool · v1.4 · © 2026 Boundless / Mallory Bailey-Finkley — all rights reserved · </span>Educational planning estimates only. Confirm every source with your lender, syndicator, CPA, and counsel.</footer>
 <div id="modal"><div id="mcard"><button class="closex" id="mClose">×</button><h2 id="mTitle"></h2><div id="mBody"></div></div></div>
 <div id="toast"></div>
 
@@ -346,10 +359,24 @@ function run(){
   const gapPct=R.tdc?Math.max(0,R.gap)/R.tdc:0;
   let h=`<div class="bigcard">
     <div class="gapbig" style="color:${R.gap>1000?'var(--bad)':'var(--green)'}">${R.gap>1000?fm(R.gap)+' gap':'✓ Gap closed'}</div>
-    <div class="gapsub">${fm(R.total)} sourced of ${fm(R.tdc)} TDC · blended cost of capital ≈ <b>${pc(R.wacc)}</b></div>
+    <div class="gapsub">${fm(R.total)} sourced of ${fm(R.tdc)} TDC${R.gap>1000?` · <b style="color:var(--bad)">${fm(R.gap)} still to raise</b>`:` · <b style="color:var(--green)">fully funded</b>`}</div>
     <div class="stackbar">${R.rows.filter(r=>r.amt>0).map(r=>`<div class="segm" style="background:${r.src.c};width:${(r.amt/R.tdc*100)}%" title="${r.src.n} ${fm(r.amt)}"></div>`).join('')}${R.gap>0?`<div class="segm gap" style="width:${gapPct*100}%"></div>`:''}</div>
     <div class="legend">${R.rows.filter(r=>r.amt>0).map(r=>`<span class="li"><span class="sw" style="background:${r.src.c}"></span>${r.src.n} · ${pc(r.amt/R.tdc)}</span>`).join('')}${R.gap>1000?`<span class="li"><span class="sw" style="background:var(--bad)"></span>GAP · ${pc(gapPct)}</span>`:''}</div>
   </div>`;
+
+  // blended cost of capital — plain-English scoreboard (the "aha")
+  const senRate=A.rate/100;
+  const cheapAmt=R.rows.filter(r=>r.amt>0 && r.src.cost(A)===0).reduce((a,r)=>a+r.amt,0);
+  const below=R.wacc>0 && R.wacc<senRate;
+  const waccColor=R.wacc<=0?'var(--dim)':(below?'var(--green)':'var(--bad)');
+  const waccNote = R.wacc<=0
+      ? 'Add a senior loan or equity to see your blended rate.'
+      : (below
+        ? `Because you blended <b>${pc(senRate)}</b> senior debt with <b>${fm(cheapAmt)}</b> of 0%-cost grants &amp; credits, your real cost of money is <b class="score-good">${pc(R.wacc)}</b> \u2014 <b>cheaper than borrowing alone.</b>`
+        : `Expensive layers (equity / mezz) are pulling your cost of money to <b class="score-bad">${pc(R.wacc)}</b> \u2014 above your <b>${pc(senRate)}</b> loan rate. Swap them for grants, credits, or soft debt to bring it down.`);
+  h+=`<div class="bigcard scorecard"><div class="secl" style="margin-top:0">\ud83d\udcca Blended cost of capital <span class="tip" tabindex="0">?<span class="tipbox">The weighted-average rate across every dollar in the stack \u2014 debt, equity, and free money combined.</span></span></div>
+    <div class="score-hero"><div class="score-big" style="color:${waccColor}">${pc(R.wacc)}</div>
+    <div class="score-note">${waccNote}</div></div></div>`;
 
   h+=`<div class="bigcard"><div class="secl">Sources &amp; uses</div><table class="sut">
     ${R.rows.map(r=>`<tr><td>${r.src.e} ${r.src.n}${sel.ovr[r.k]!=null?' <span style="color:var(--gold);font-size:10px">MANUAL</span>':''}</td><td>${fm(r.amt)}</td></tr>`).join('')}
