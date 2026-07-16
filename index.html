@@ -27,6 +27,28 @@ header{position:sticky;top:0;z-index:40;height:58px;display:flex;align-items:cen
 header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(234,179,8,.5),rgba(56,189,248,.5),transparent)}
 #logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.02em}
 #logo b{color:var(--gold)}
+/* how-it-works strip */
+.flow{display:flex;align-items:stretch;gap:0;max-width:980px;margin:14px auto 0;padding:0 16px}
+.flow .fstep{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;text-align:left;display:flex;gap:10px;align-items:flex-start;min-width:0}
+.flow .fn{width:24px;height:24px;border-radius:50%;background:var(--gold);color:#221a03;font-weight:800;font-size:12.5px;display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+.flow .ft b{display:block;font-size:12.5px;color:var(--ink)}
+.flow .ft span{font-size:11.5px;color:var(--dim);line-height:1.45}
+.flow .farrow{align-self:center;color:var(--faint);font-size:17px;padding:0 7px;flex-shrink:0}
+@media(max-width:700px){.flow{flex-direction:column;gap:6px}.flow .farrow{transform:rotate(90deg);align-self:center;padding:0}}
+/* example deal */
+.exbtn{width:100%;border:1px dashed var(--gold);background:rgba(234,179,8,.07);color:var(--gold);border-radius:10px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:14px}
+.exbtn:hover{background:rgba(234,179,8,.14)}
+.exbanner{display:none;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.35);border-radius:10px;padding:9px 12px;font-size:12.5px;color:var(--dim);margin-bottom:14px}
+.exbanner b{color:var(--green)}
+/* guided tour */
+.tourhl{outline:2px solid var(--gold);outline-offset:3px;border-radius:10px;transition:outline .2s}
+#tourCard{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(140%);width:min(440px,92vw);background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:15px 17px;z-index:95;box-shadow:0 18px 50px -12px rgba(0,0,0,.6);transition:transform .3s}
+#tourCard.on{transform:translateX(-50%) translateY(0)}
+#tourCard .tstep{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+#tourCard .ttext{font-size:13.5px;color:var(--ink);margin:5px 0 12px;line-height:1.5}
+#tourCard .tbtns{display:flex;gap:8px;justify-content:flex-end}
+#tourCard .tbtns button{border:1px solid var(--line);background:var(--panel);color:var(--dim);border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
+#tourCard .tbtns button.pri{background:var(--gold);border-color:var(--gold);color:#221a03}
 .hsp{flex:1}
 .pill{font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:6px 13px;color:var(--dim);background:var(--card);cursor:pointer}
 .pill.pro{background:linear-gradient(90deg,#eab308,#f59e0b);color:#221a03;border:none;font-weight:700}
@@ -109,7 +131,7 @@ details.asm summary{cursor:pointer;font-size:12.5px;font-weight:700;padding:10px
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(90px);background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:11px 20px;font-size:13.5px;font-weight:600;z-index:90;transition:transform .25s}
 #toast.on{transform:translateX(-50%) translateY(0)}
 footer{max-width:1280px;margin:0 auto;padding:0 22px 40px;color:var(--faint);font-size:12px}
-@media print{header,.tagline,#inputs,.rowbtns,.locknote,footer .np{display:none!important}
+@media print{header,.tagline,#inputs,.rowbtns,.locknote,footer .np,.flow,#tourCard,.exbtn,.exbanner{display:none!important}
 body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;background:#fff;color:#000}
 .gapbig{color:#000}#app{display:block}}
 
@@ -131,6 +153,7 @@ body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;backgroun
 <header>
   <div id="logo"><svg width="26" height="26" viewBox="0 0 32 32"><rect x="7" y="21" width="18" height="5" rx="2" fill="#38bdf8"/><rect x="9" y="14" width="14" height="5" rx="2" fill="#eab308"/><rect x="11" y="7" width="10" height="5" rx="2" fill="#34d399"/></svg> Cap<b>Stack</b></div>
   <div class="hsp"></div>
+  <button class="pill" id="tourBtn" title="Replay the 60-second tour">&#127891; Tour</button>
   <button class="pill pro" id="proBtn">Go Pro</button>
 </header>
 
@@ -139,8 +162,18 @@ body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;backgroun
   <p>Layer senior debt, tax-credit equity, grants, soft loans, deferred fee, and sponsor equity against your total development cost — see the financing gap, the blended cost of capital, the stacking conflicts, and the order to chase each source.</p>
 </div>
 
+<div class="flow" aria-label="How CapStack works">
+  <div class="fstep"><div class="fn">1</div><div class="ft"><b>Describe the deal</b><span>Total development cost + stabilized NOI — the height the stack must reach.</span></div></div>
+  <div class="farrow">&rarr;</div>
+  <div class="fstep"><div class="fn">2</div><div class="ft"><b>Layer the sources</b><span>Debt, tax-credit equity, grants, soft loans, deferred fee — tap to add, override any amount.</span></div></div>
+  <div class="farrow">&rarr;</div>
+  <div class="fstep"><div class="fn">3</div><div class="ft"><b>Read the verdict</b><span>Gap covered or not, stacking conflicts flagged, blended cost — then print the lender exhibit.</span></div></div>
+</div>
+
 <div id="app">
   <div id="inputs">
+    <button class="exbtn" id="exBtn">&#9654; Load an example deal &mdash; see a finished stack first</button>
+    <div class="exbanner" id="exBanner"><b>Mill Street Lofts</b> &mdash; a 64-unit 4% LIHTC rehab: $14.2M cost, bonds + credits + a city grant. Edit anything; the stack updates live. Your own numbers replace it the moment you type.</div>
     <label class="lbl">Total development cost (TDC, $) <span class="tip" tabindex="0">?<span class="tipbox">Every dollar it takes to build the deal — land, hard costs, soft costs, and reserves. This is the height your stack has to reach.</span></span></label>
     <input class="tin" id="tdcIn" type="number" value="12000000" step="100000" min="0">
     <label class="lbl">Stabilized NOI (optional — sizes the senior loan, $/yr) <span class="tip" tabindex="0">?<span class="tipbox">Net operating income: annual rent minus operating expenses. It sets how much senior debt the deal can safely carry.</span></span></label>
@@ -162,9 +195,14 @@ body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;backgroun
   <div id="out"><div id="scenRow"></div><div id="results"></div></div>
 </div>
 
-<footer><span class="np">CapStack · a <a href="https://nesoai.github.io/mallory/" target="_blank" rel="noopener">Boundless</a> tool · v1.4 · © 2026 Boundless / Mallory Bailey-Finkley — all rights reserved · </span>Educational planning estimates only. Confirm every source with your lender, syndicator, CPA, and counsel.</footer>
+<footer><span class="np">CapStack · a <a href="https://nesoai.github.io/mallory/" target="_blank" rel="noopener">Boundless</a> tool · v1.6 · © 2026 Boundless / Mallory Bailey-Finkley — all rights reserved · </span>Educational planning estimates only. Confirm every source with your lender, syndicator, CPA, and counsel.</footer>
 <div id="modal"><div id="mcard"><button class="closex" id="mClose">×</button><h2 id="mTitle"></h2><div id="mBody"></div></div></div>
 <div id="toast"></div>
+<div id="tourCard" role="dialog" aria-label="Guided tour">
+  <div class="tstep" id="tourStep"></div>
+  <div class="ttext" id="tourText"></div>
+  <div class="tbtns"><button id="tourSkip">Skip</button><button class="pri" id="tourNext">Next</button></div>
+</div>
 
 <script>
 /* ============ CAPSTACK v1.0 — config ============ */
@@ -252,6 +290,45 @@ $('asmBox').innerHTML=ASM.map(a=>`<div class="asmrow">${a[1]}<input type="number
 ASM.forEach(a=>$('a-'+a[0]).oninput=()=>{const v=parseFloat($('a-'+a[0]).value);if(!isNaN(v)){A[a[0]]=v;run();}});
 ['tdcIn','noiIn'].forEach(id=>$(id).oninput=()=>run());
 $('runBtn').onclick=()=>{run();const r=$('results');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'start'});};
+
+/* ============ EXAMPLE DEAL ============ */
+const EXAMPLE={tdc:14200000,noi:665000,prof:'l4',ovr:{grant:750000,gap:500000}};
+function loadExample(){
+  $('tdcIn').value=EXAMPLE.tdc; $('noiIn').value=EXAMPLE.noi;
+  sel.prof=EXAMPLE.prof;
+  $('profRow').querySelectorAll('.seg').forEach(x=>x.classList.toggle('on',x.dataset.v===EXAMPLE.prof));
+  sel.on=new Set(PROFILES.find(p=>p[0]===sel.prof)[2]);
+  sel.ovr=Object.assign({},EXAMPLE.ovr);
+  profNote(); renderSrc(); run();
+  $('exBanner').style.display='block';
+  toast('Example loaded \u2014 edit anything, it\u2019s yours now');
+  try{ if(typeof gtag==='function') gtag('event','example_load',{tool:'capstack'}); }catch(e){}
+}
+$('exBtn').onclick=loadExample;
+
+/* ============ GUIDED TOUR ============ */
+const TOUR=[
+ ['tdcIn','Step 1 of 5','This is the whole game: <b>total development cost</b>. Every source you layer in below is trying to climb to this number.'],
+ ['profRow','Step 2 of 5','Pick a <b>deal profile</b> \u2014 it pre-loads the capital sources that type of deal actually uses, so you start from a realistic stack.'],
+ ['srcList','Step 3 of 5','<b>Tap a source</b> to layer it in or out; type in the box to override its size. Each card tells you how it\u2019s sized and how to actually chase it.'],
+ ['out','Step 4 of 5','The <b>verdict updates live</b>: covered or gap, stacking conflicts, blended cost of capital. Pin scenarios to compare structures.'],
+ ['exBtn','Step 5 of 5','Fastest way to learn it: <b>load the example deal</b> and pull it apart. Nothing you do here is saved anywhere but this device.']
+];
+let tourI=-1;
+function tourClear(){document.querySelectorAll('.tourhl').forEach(e=>e.classList.remove('tourhl'));}
+function tourShow(i){
+  tourClear();
+  if(i>=TOUR.length){ $('tourCard').classList.remove('on'); try{localStorage.setItem('capstack.tour','done')}catch(e){}; return; }
+  tourI=i; const [id,st,tx]=TOUR[i];
+  const el=$(id); if(el){ el.classList.add('tourhl'); el.scrollIntoView({behavior:'smooth',block:'center'}); }
+  $('tourStep').textContent=st; $('tourText').innerHTML=tx;
+  $('tourNext').textContent = i===TOUR.length-1 ? 'Done' : 'Next';
+  $('tourCard').classList.add('on');
+}
+$('tourNext').onclick=()=>tourShow(tourI+1);
+$('tourSkip').onclick=()=>tourShow(TOUR.length);
+$('tourBtn').onclick=()=>tourShow(0);
+setTimeout(()=>{ try{ if(!localStorage.getItem('capstack.tour')) tourShow(0); }catch(e){} },1100);
 
 /* ============ MODEL ============ */
 function mconst(rate,yrs){const r=rate/1200,n=yrs*12;if(r<=0)return 1/n*12;return (r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1))*12;}
