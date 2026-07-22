@@ -212,7 +212,7 @@ body{background:#fff;color:#000}.bigcard,.play,.step{border-color:#ccc;backgroun
 </div>
 
 <button id="scrollTop" title="Back to top" aria-label="Back to top">↑</button>
-<footer><span class="np">CapStack · a <a href="https://nesoai.github.io/mallory/" target="_blank" rel="noopener">Boundless</a> tool · v1.12 &middot; <a href="https://neso-queue.nesoai-us.workers.dev/form/feedback?source=capstack" target="_blank" rel="noopener">Feedback</a> · © 2026 Boundless — all rights reserved · </span>Educational planning estimates only. Confirm every source with your lender, syndicator, CPA, and counsel.</footer>
+<footer><span class="np">CapStack · v1.14 &middot; <a href="https://neso-queue.nesoai-us.workers.dev/form/feedback?source=capstack" target="_blank" rel="noopener">Feedback</a> · © 2026 NESO — all rights reserved · </span>Educational planning estimates only. Confirm every source with your lender, syndicator, CPA, and counsel.</footer>
 <div id="modal"><div id="mcard"><button class="closex" id="mClose">×</button><h2 id="mTitle"></h2><div id="mBody"></div></div></div>
 <div id="toast"></div>
 <div id="tourCard" role="dialog" aria-label="Guided tour">
@@ -544,5 +544,15 @@ profNote();renderSrc();proUI();renderScens();run();
  b.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};}
  if(document.getElementById('scrollTop'))init();else document.addEventListener('DOMContentLoaded',init);})();
 </script>
+
+<!-- back to top -->
+<button id="toTop" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+<style>
+#toTop{position:fixed;left:16px;bottom:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 22px -8px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(10px);transition:.25s;z-index:150}
+#toTop.on{opacity:1;visibility:visible;transform:none}
+#tourCard.on~#toTop{display:none!important}
+@media print{#toTop{display:none!important}}
+</style>
+<script>(function(){var b=document.getElementById('toTop');function chk(){if(window.scrollY>500)b.classList.add('on');else b.classList.remove('on');}window.addEventListener('scroll',chk,{passive:true});chk();})();</script>
 </body>
 </html>
