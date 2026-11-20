@@ -1,0 +1,35 @@
+# CapStack
+
+> CapStack models real-estate capital stacks: senior debt, LIHTC & historic tax credits, grants, soft loans, deferred developer fee, and equity — see your financing gap, blended cost, stacking conflicts, and the order to secure each source.
+
+CapStack is a free web tool at https://capstack.nesohq.com/. It runs in the browser with no account.
+It is for real-estate developers, housing sponsors and nonprofits assembling project financing.
+
+## Questions CapStack answers
+
+- **What is a capital stack?** The full set of sources funding a project, ordered by repayment priority: senior debt first, then any subordinate or soft debt, then tax credit equity and grants, then sponsor equity last.
+- **How do I close a financing gap on a project?** Four levers, roughly in order of how often they work: reduce scope or cost, add subordinate or soft sources such as grants and gap loans, defer part of the developer fee, or bring in more equity at a lower return.
+- **Can low-income housing and historic tax credits be combined on one deal?** Yes, and it is common on adaptive-reuse projects — but the two interact rather than simply adding.
+- **What order should I secure financing sources in?** Start with whichever source constrains the others.
+
+## Use it
+
+- [Open CapStack](https://capstack.nesohq.com/)
+
+## About NESO
+
+CapStack is made by NESO HQ LLC, which offers advisory services, research reports and free tools for founders,
+small businesses, developers and municipalities: https://nesohq.com/ (its llms.txt: https://nesohq.com/llms.txt).
+Questions: hello@nesohq.com · (901) 295-0322.
+
+## Other free NESO tools
+
+- [GrantFit](https://grantfit.nesohq.com/)
+- [MarketFit](https://marketfit.nesohq.com/)
+- [PlanForge](https://planforge.nesohq.com/)
+- [MarketScope](https://marketscope.nesohq.com/)
+- [ProForma](https://proforma.nesohq.com/)
+- [SiteShaper](https://siteshaper.nesohq.com/)
+- [BuildBrief](https://buildbrief.nesohq.com/)
+- [Bird's Eye instant read](https://birdseye.nesohq.com/): a free first look at a parcel, with written reports quoted to scope.
+- [NESO for Contractors](https://contractors.nesohq.com/): free public bids and state-by-state guides for contractors.
